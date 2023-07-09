@@ -22,7 +22,7 @@ that requests JSON data from server
 end note
 
 browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/data.json
-server-->browser: [{content: "asdd", date: "2022-06-23T08:56:19.055Z"}, ...]
+server-->browser: [{content: "HTML is easy", date: "2023-07-09"}, ...]
 
 note over browser:
 browser executes the event handler
