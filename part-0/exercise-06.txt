@@ -1,0 +1,8 @@
+note over browser:
+The browser will handle the request through js file
+It insert the new input content into the html and then make POST request
+Re-render the page
+end note
+
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+server-->browser: {"message":"note created"}
