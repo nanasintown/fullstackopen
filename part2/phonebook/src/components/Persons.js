@@ -1,16 +1,22 @@
-const Persons = ({ personsToShow, deletePerson }) => {
+function Persons({ persons, filterText, handleDeletePerson }) {
   return (
     <div>
-      {personsToShow.map((person) => (
-        <div key={person.name}>
-          {person.name} {person.number}{' '}
-          <button onClick={() => deletePerson(person.id, person.name)}>
-            delete
-          </button>
-        </div>
-      ))}
+      <ul>
+        {persons
+          .filter((person) => person.name.includes(filterText))
+          .map((person) => (
+            <div key={person.name}>
+              <li>
+                {person.name} {person.number}
+                <button onClick={() => handleDeletePerson(person.name)}>
+                  delete
+                </button>
+              </li>
+            </div>
+          ))}
+      </ul>
     </div>
   );
-};
+}
 
 export default Persons;

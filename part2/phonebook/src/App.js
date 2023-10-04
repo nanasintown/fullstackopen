@@ -1,78 +1,121 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
+import phonebookService from './services/person';
+import Notification from './components/Notification';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState('');
-  const [newNumber, setNewNumber] = useState('');
-  const [newSearchName, setNewSearchName] = useState('');
+  const [message, setMessage] = useState({});
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then((response) => {
-      setPersons(response.data);
-    });
+    phonebookService.getAll().then((personData) => setPersons(personData));
   }, []);
 
-  const addPerson = (event) => {
-    event.preventDefault();
-    const newPersonObj = { name: newName, number: newNumber };
+  const [newName, setNewName] = useState('');
+  const [newNumber, setnewNumber] = useState('');
+  const [filterText, setFilterText] = useState('');
 
-    let exists = false;
-    for (let i = 0; i < persons.length; i++) {
-      if (persons[i].name === newPersonObj.name) {
-        exists = true;
-      }
-    }
-
-    if (exists) {
-      alert(`${newName} is already added to phonebook`);
-    } else {
-      setPersons(persons.concat(newPersonObj));
-    }
-    setNewName('');
-    setNewNumber('');
+  const handleNumberChange = (event) => {
+    setnewNumber(event.target.value);
   };
 
   const handleNameChange = (event) => {
     setNewName(event.target.value);
   };
-  const handleNumberChange = (event) => {
-    setNewNumber(event.target.value);
-  };
-  const handleSearchName = (event) => {
-    setNewSearchName(event.target.value);
+
+  const handleFilterTextChange = (event) => {
+    setFilterText(event.target.value);
   };
 
-  const personsToShow = () => {
-    if (newSearchName === '' || !newSearchName) {
-      return persons;
+  const addPhone = (event) => {
+    event.preventDefault();
+
+    const index = persons.findIndex((person) => person.name === newName);
+    const person = persons[index];
+
+    if (index !== -1) {
+      if (person.number === newNumber) {
+        alert(`${newName} is already added to phonebook with the same number`);
+      } else {
+        const userResponse = window.confirm(
+          `${person.name} is already added to phonebook, replace the old number with the new one?`
+        );
+
+        if (userResponse) {
+          phonebookService
+            .update({ ...person, number: newNumber })
+            .then((personData) => {
+              setPersons(
+                persons.map((p) => (p.id === personData.id ? personData : p))
+              );
+
+              setMessage({ value: `Updated ${person.name}`, type: 'success' });
+              setTimeout(() => setMessage({}), 3000);
+              setNewName('');
+              setnewNumber('');
+            })
+            .catch((e) => {
+              setMessage({
+                value: `Information of ${person.name} has already been removed from server`,
+                type: 'failure',
+              });
+              setTimeout(() => setMessage({}), 3000);
+              setPersons(persons.filter((p) => p.id !== person.id));
+              setNewName('');
+              setnewNumber('');
+            });
+        }
+      }
     } else {
-      persons.filter((person) =>
-        person.name.toLowerCase().includes(newSearchName.toLowerCase())
-      );
+      const newPerson = { name: newName, number: newNumber };
+
+      phonebookService
+        .create(newPerson)
+        .then((personData) => setPersons([...persons, personData]));
+      setNewName('');
+      setnewNumber('');
+      setMessage({ value: `Added ${newPerson.name}`, type: 'success' });
+      setTimeout(() => setMessage({}), 3000);
+    }
+  };
+
+  const deletePerson = (name) => {
+    const userResponse = window.confirm(`delete ${name} ?`);
+
+    const { id } = persons.find((person) => person.name === name);
+
+    if (userResponse) {
+      phonebookService.deletePerson(id).then((response) => {
+        if (response === 200) {
+          setPersons(persons.filter((p) => p.id !== id));
+        }
+      });
     }
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter
-        newSearchName={newSearchName}
-        handleSearchName={handleSearchName}
-      />
-      <h2>Add a new</h2>
+      <Notification message={message.value} type={message.type} />
+      <Filter value={filterText} onChange={handleFilterTextChange} />
+      <div>
+        <h3>Add a new</h3>
+      </div>
       <PersonForm
-        addPerson={addPerson}
-        newName={newName}
-        handleNameChange={handleNameChange}
-        newNumber={newNumber}
-        handleNumberChange={handleNumberChange}
+        onSubmit={addPhone}
+        nameValue={newName}
+        onNameValueChange={handleNameChange}
+        numberValue={newNumber}
+        onNumberValueChange={handleNumberChange}
       />
-      <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <h3>Numbers</h3>
+      <Persons
+        persons={persons}
+        filterText={filterText}
+        handleDeletePerson={deletePerson}
+      />
     </div>
   );
 };
