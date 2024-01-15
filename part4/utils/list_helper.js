@@ -35,4 +35,23 @@ const mostBlogs = (blogs = []) => {
   return { author: topBlogers.author, blogs: topBlogers.blogs };
 };
 
-module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs };
+const mostLikes = (blogs = []) => {
+  const topLikes = blogs.reduce(
+    (acc, b) => {
+      if (!acc[b.author]) {
+        acc[b.author] = { likes: 0 };
+      }
+      acc[b.author].likes += b.likes;
+      if (acc.likes < acc[b.author].likes) {
+        acc.author = b.author;
+        acc.likes = acc[b.author].likes;
+      }
+      return acc;
+    },
+    { likes: 0 }
+  );
+
+  return { author: topLikes.author, likes: topLikes.likes };
+};
+
+module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes };
