@@ -50,7 +50,6 @@ const mostLikes = (blogs = []) => {
     },
     { likes: 0 }
   );
-
   return { author: topLikes.author, likes: topLikes.likes };
 };
 
