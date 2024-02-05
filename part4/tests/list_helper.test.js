@@ -101,7 +101,7 @@ describe('most blogs', () => {
   });
 });
 
-describe('most likes', () => {
+describe('Most likes', () => {
   test('of undefined list', () => {
     expect(listHelper.mostLikes(undefined)).toEqual({
       author: undefined,
