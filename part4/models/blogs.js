@@ -14,7 +14,7 @@ mongoose
 const blogSchema = mongoose.Schema({
   title: {
     type: String,
-    minLength: 3,
+    required: true,
   },
   author: {
     type: String,
@@ -22,15 +22,12 @@ const blogSchema = mongoose.Schema({
   },
   url: {
     type: String,
-    validate: {
-      validator: function (v) {
-        return /^http:\/\/|^https:\/\//.test(v);
-      },
-      message: (p) => `${p.value} is not a valid url!`,
-    },
     required: [true, 'url reuqired'],
   },
-  likes: Number,
+  likes: {
+    type: Number,
+    default: 0,
+  },
 });
 
 blogSchema.set('toJSON', {

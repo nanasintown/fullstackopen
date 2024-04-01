@@ -50,6 +50,7 @@ describe('POST /api/blogs', () => {
     const response = await api.get('/api/blogs');
     assert.strictEqual(response.body.length, helper.initialBlogs.length + 1);
   });
+
   test('adds the proper content to the database', async () => {
     await api
       .post('/api/blogs')
@@ -64,6 +65,30 @@ describe('POST /api/blogs', () => {
 
     const blogAuthor = response.body.map((r) => r.author);
     assert(blogAuthor.includes('Author'));
+  });
+
+  test('sets likes to 0 if undefined', async () => {
+    const undefinedLikesBlog = {
+      title: 'Check likes',
+      author: 'Another Author',
+      url: 'aalto.fi',
+    };
+    await api
+      .post('/api/blogs')
+      .send(undefinedLikesBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const response = await api.get('/api/blogs');
+    const savedBlog = response.body.find((b) => b.title === 'Check likes');
+    assert.strictEqual(savedBlog.likes, 0);
+  });
+
+  test('returns 400 if title or url is undefined', async () => {
+    const blogWithOnlyAuthor = {
+      author: 'Unique author',
+    };
+    await api.post('/api/blogs').send(blogWithOnlyAuthor).expect(400);
   });
 });
 
