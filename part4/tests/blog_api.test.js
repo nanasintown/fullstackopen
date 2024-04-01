@@ -92,6 +92,49 @@ describe('POST /api/blogs', () => {
   });
 });
 
+describe('DELETE /api/blogs/:id', () => {
+  test('succesfully deletes existing blog', async () => {
+    const blogList = await helper.blogsInDB();
+    const blogToDelete = blogList[0];
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+    const blogsAtEnd = await helper.blogsInDB();
+
+    const contents = blogsAtEnd.map((r) => r.title);
+    assert(!contents.includes(blogToDelete.title));
+
+    assert.strictEqual(blogsAtEnd.length, blogList.length - 1);
+  });
+  test('returns 400 if blog to delete does not exist', async () => {
+    const nonExistingId =
+      'ItIsHighlyUnlikelyThatAnIdLikeThisGotGeneratedByMongo';
+    await api.delete(`/api/blogs/${nonExistingId}`).expect(400);
+  });
+});
+
+describe('PUT /api/blogs/:id', () => {
+  test('succesfully updates existing blog', async () => {
+    const blogList = await helper.blogsInDB();
+    const blogToUpdate = blogList[0];
+    const likesInStart = blogToUpdate.likes;
+    blogToUpdate.likes += 1;
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send({ blogToUpdate })
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+
+    const response = await api.get('/api/blogs');
+    const updatedBlog = response.body.find((b) => b.id === blogToUpdate.id);
+    assert.strictEqual(updatedBlog.likes, likesInStart);
+  });
+  test('returns 400 if using invalid id', async () => {
+    const nonExistingId = 'weirdoIDnoEveryonecanimagineDragon';
+    await api.put(`/api/blogs/${nonExistingId}`).expect(400);
+  });
+});
 after(async () => {
   await mongoose.connection.close();
 });
