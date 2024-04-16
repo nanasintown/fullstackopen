@@ -114,7 +114,7 @@ describe('DELETE /api/blogs/:id', () => {
 });
 
 describe('PUT /api/blogs/:id', () => {
-  test('succesfully updates existing blog', async () => {
+  test('Update blog OK!', async () => {
     const blogList = await helper.blogsInDB();
     const blogToUpdate = blogList[0];
     const likesInStart = blogToUpdate.likes;
@@ -130,7 +130,7 @@ describe('PUT /api/blogs/:id', () => {
     const updatedBlog = response.body.find((b) => b.id === blogToUpdate.id);
     assert.strictEqual(updatedBlog.likes, likesInStart);
   });
-  test('returns 400 if using invalid id', async () => {
+  test('Invalid ID, code 400', async () => {
     const nonExistingId = 'weirdoIDnoEveryonecanimagineDragon';
     await api.put(`/api/blogs/${nonExistingId}`).expect(400);
   });
