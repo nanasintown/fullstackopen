@@ -17,10 +17,11 @@ app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
 
-app.use('/api/blogs', blogRouter);
+app.use('/api/blogs', middlewares.userExtractor, blogRouter);
 app.use('/api/users', userRouter);
 app.use('/api/login', loginRouter);
 app.use(middlewares.tokenExtractor);
+app.use(middlewares.userExtractor);
 app.use(unknownEndpoint);
 app.use(errorHandler);
 
