@@ -35,7 +35,7 @@ beforeEach(async () => {
 });
 
 describe('GET /api/blogs', () => {
-  test('returns JSON content', async () => {
+  test('Return JSON content', async () => {
     await api
       .get('/api/blogs')
       .expect(200)
@@ -48,7 +48,7 @@ describe('GET /api/blogs', () => {
       .set('Authentication', authToken);
     assert.strictEqual(response.body.length, helper.initialBlogs.length);
   });
-  test('returns blogs with an id field', async () => {
+  test('Blogs with ID', async () => {
     const response = await api
       .get('/api/blogs')
       .set('Authentication', authToken);
@@ -67,7 +67,7 @@ describe('POST /api/blogs', () => {
     url: 'aalto.fi',
     likes: 0,
   };
-  test('increases the number of returned blogs by one', async () => {
+  test('Increase number of blogs', async () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
@@ -81,7 +81,7 @@ describe('POST /api/blogs', () => {
     assert.strictEqual(response.body.length, helper.initialBlogs.length + 1);
   });
 
-  test('adds the proper content to the database', async () => {
+  test('Add blogs', async () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
@@ -100,7 +100,7 @@ describe('POST /api/blogs', () => {
     assert(blogAuthor.includes('Author'));
   });
 
-  test('sets likes to 0 if undefined', async () => {
+  test('Initilize like to 0 if not specified', async () => {
     const undefinedLikesBlog = {
       title: 'Check likes',
       author: 'Another Author',
@@ -120,7 +120,7 @@ describe('POST /api/blogs', () => {
     assert.strictEqual(savedBlog.likes, 0);
   });
 
-  test('returns 400 if title or url is undefined', async () => {
+  test('Code 400 undefine title or url', async () => {
     const blogWithOnlyAuthor = {
       author: 'Unique author',
     };
@@ -149,9 +149,8 @@ describe('DELETE /api/blogs/:id', () => {
 
     assert.strictEqual(blogsAtEnd.length, blogList.length - 1);
   });
-  test('returns 400 if blog to delete does not exist', async () => {
-    const nonExistingId =
-      'ItIsHighlyUnlikelyThatAnIdLikeThisGotGeneratedByMongo';
+  test('Code 400 for blog not exist', async () => {
+    const nonExistingId = 'weirdoIDnoEveryonecanimagineDragonComingback';
     await api
       .delete(`/api/blogs/${nonExistingId}`)
       .set('Authentication', authToken)
