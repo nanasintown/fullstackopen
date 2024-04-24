@@ -21,6 +21,14 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
+const requestLogger = (request, response, next) => {
+  logger.info('Method:', request.method);
+  logger.info('Path:  ', request.path);
+  logger.info('Body:  ', request.body);
+  logger.info('---');
+  next();
+};
+
 const tokenExtractor = (request) => {
   const authorization = request.get('authorization');
   if (authorization && authorization.startsWith('Bearer ')) {
@@ -38,8 +46,14 @@ const userExtractor = async (request, response, next) => {
   next();
 };
 
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' });
+};
+
 module.exports = {
   errorHandler,
   userExtractor,
+  unknownEndpoint,
   tokenExtractor,
+  requestLogger,
 };
