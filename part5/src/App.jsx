@@ -68,6 +68,24 @@ const App = () => {
     window.location.reload();
   };
 
+  const handleRemoveBlog = async (blogToDelete) => {
+    try {
+      if (
+        window.confirm(
+          `Remove blog ${blogToDelete.title} by ${blogToDelete.author}?`
+        )
+      ) {
+        await blogService.removeBlog(blogToDelete.id);
+        setBlogs(blogToDelete);
+      }
+    } catch (exception) {
+      showMessage('error', 'Cannot delete the blog.');
+      setTimeout(() => {
+        clearMessage();
+      }, 5000);
+    }
+  };
+
   const addBlog = async (blogObject) => {
     console.log('creating a new blog..');
     blogFormRef.current.toggleVisibility();
@@ -91,10 +109,20 @@ const App = () => {
       console.log('..blog liked!');
       showMessage('correct', 'Liked!');
     } catch (exception) {
-      console.log('..failed to like blog!');
-      showMessage('error', 'Failed to like blog');
+      console.log('..failed!');
+      showMessage('error', 'Cannot like blog');
     }
   };
+
+  useEffect(() => {
+    if (user !== null) {
+      blogService
+        .getAll()
+        .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
+    }
+  }, [user, newBlog]);
+
+  const sortBlogs = blogs.sort((a, b) => b.likes - a.likes);
 
   if (user === null) {
     return (
@@ -144,7 +172,7 @@ const App = () => {
         </button>
       </div>
       <div>
-        {blogs.map((blog) => (
+        {sortBlogs.map((blog) => (
           <Blog key={blog.id} blog={blog} />
         ))}
       </div>
@@ -154,7 +182,12 @@ const App = () => {
 
       <h3>All blogs</h3>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          likeBlog={likeBlog}
+          handleRemoveBlog={handleRemoveBlog}
+        />
       ))}
       {/* <h3>Create new blog</h3>
       <div className={messageStyle}>{message}</div>
