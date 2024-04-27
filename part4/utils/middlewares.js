@@ -38,11 +38,22 @@ const tokenExtractor = (request) => {
 };
 
 const userExtractor = async (request, response, next) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' });
+  const token = tokenExtractor(request);
+  if (!token) {
+    return response.status(401).json({ error: 'Token is missimg' });
   }
-  request.user = await User.findById(decodedToken.id);
+
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'Invalid token' });
+  }
+
+  const user = await User.findById(decodedToken.id);
+  if (!user) {
+    return response.status(401).json({ error: 'User not found' });
+  }
+  request.user = user;
+
   next();
 };
 

@@ -1,4 +1,5 @@
 const Blog = require('../models/blogs');
+const logger = require('../utils/logger');
 // const User = require('../models/user');
 // const jwt = require('jsonwebtoken');
 // const middlewares = require('../utils/middlewares');
@@ -12,6 +13,7 @@ blogRouter.get('/', async (request, response) => {
 
 blogRouter.post('/', async (request, response) => {
   const body = request.body;
+  logger.info(`requesr body: ${body}`);
   /**
    const user = await User.findById(body.user);
   const decodedToken = jwt.verify(request.token, process.env.SECRET);
