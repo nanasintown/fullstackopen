@@ -76,13 +76,23 @@ const App = () => {
       const returnedBlog = await blogService.create(blogObject);
       setBlogs([...blogs, returnedBlog]);
       console.log('..new blog created!');
-      toast.success(
-        `Succesfully added ${blogObject.title} by ${blogObject.author}`,
-        toastConfig
-      );
+      showMessage('correct', 'Successfully created!');
     } catch (exception) {
       console.log('..blog creation failed!');
-      toast.error('Failed to create blog', toastConfig);
+      showMessage('error', "Can't create new blog!");
+    }
+  };
+
+  const likeBlog = async (blogObject) => {
+    try {
+      await blogService.update(blogObject);
+      const updatedBlogs = await blogService.getAll();
+      setBlogs(updatedBlogs);
+      console.log('..blog liked!');
+      showMessage('correct', 'Liked!');
+    } catch (exception) {
+      console.log('..failed to like blog!');
+      showMessage('error', 'Failed to like blog');
     }
   };
 
@@ -144,7 +154,7 @@ const App = () => {
 
       <h3>All blogs</h3>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
       ))}
       {/* <h3>Create new blog</h3>
       <div className={messageStyle}>{message}</div>
