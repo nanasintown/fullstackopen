@@ -26,12 +26,14 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
       addedBy: blog.user.id,
     });
   };
-  const removeBlog = (event) => {
-    event.preventDefault();
-    if (window.confirm(`Are you sure you want to delete ${blog.title}?`)) {
-      deleteBlog(blog);
+  const removeBlog = (userNameLoggedIn, blog) => {
+    if (userNameLoggedIn === blog.user.username) {
+      return (
+        <div>
+          <button onClick={() => removeBlog(blog)}>Remove</button>
+        </div>
+      );
     }
-    console.log('Cancel.');
   };
 
   return (
@@ -73,7 +75,7 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
           {blog.user &&
             blog.user.username &&
             blog.user.username === user.username && (
-              <button onClick={removeBlog}>remove</button>
+              <button onClick={removeBlog(user.username, blog)}>remove</button>
             )}
         </div>
       </div>
