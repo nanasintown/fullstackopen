@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Blog from './components/Blog';
+import BlogForm from './components/BlogForm';
+import Togglable from './components/Togglable';
 import Notification from './components/Notification';
 import blogService from './services/blogs';
 import loginService from './services/login';
@@ -10,11 +12,10 @@ const App = () => {
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [url, setUrl] = useState('');
   const [message, setMessage] = useState(null);
   const [messageStyle, setMessageStyle] = useState('');
+  const [loginVisible, setLoginVisible] = useState(false);
+  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -67,30 +68,30 @@ const App = () => {
     window.location.reload();
   };
 
-  const handleCreate = async (event) => {
-    event.preventDefault();
+  const addBlog = async (blogObject) => {
     console.log('creating a new blog..');
+    blogFormRef.current.toggleVisibility();
 
     try {
-      const newBlog = await blogService.create({ title, author, url });
-      setTitle('');
-      setAuthor('');
-      setUrl('');
-      setBlogs([...blogs, newBlog]);
-      showMessage('correct', 'Blog successfully created!');
+      const returnedBlog = await blogService.create(blogObject);
+      setBlogs([...blogs, returnedBlog]);
       console.log('..new blog created!');
+      toast.success(
+        `Succesfully added ${blogObject.title} by ${blogObject.author}`,
+        toastConfig
+      );
     } catch (exception) {
       console.log('..blog creation failed!');
-      showMessage('error', 'Can not create new blog');
-      setTimeout(() => {
-        hideMessage();
-      }, 5000);
+      toast.error('Failed to create blog', toastConfig);
     }
   };
 
   if (user === null) {
     return (
       <div>
+        <button onClick={() => setLoginVisible(true)}>log in</button>
+
+        <button onClick={() => setLoginVisible(false)}>cancel</button>
         <Notification message={errorMessage} type="error" />
         <h2>Log in to application</h2>
         <form onSubmit={handleLogin}>
@@ -137,7 +138,15 @@ const App = () => {
           <Blog key={blog.id} blog={blog} />
         ))}
       </div>
-      <h3>Create new blog</h3>
+      <Togglable buttonLabel="create new" ref={blogFormRef}>
+        <BlogForm createBlog={addBlog} />
+      </Togglable>
+
+      <h3>All blogs</h3>
+      {blogs.map((blog) => (
+        <Blog key={blog.id} blog={blog} />
+      ))}
+      {/* <h3>Create new blog</h3>
       <div className={messageStyle}>{message}</div>
       <form onSubmit={handleCreate}>
         <div>
@@ -176,7 +185,7 @@ const App = () => {
         >
           Create
         </button>
-      </form>
+      </form> */}
     </div>
   );
 };
