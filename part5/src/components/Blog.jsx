@@ -23,6 +23,7 @@ const Blog = ({ blog, likeBlog }) => {
       url: blog.url,
       likes: blog.likes + 1,
       id: blog.id,
+      addedBy: blog.user.id,
     });
   };
 
