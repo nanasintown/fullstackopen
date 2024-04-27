@@ -81,7 +81,7 @@ const App = () => {
     } catch (exception) {
       showMessage('error', 'Cannot delete the blog.');
       setTimeout(() => {
-        clearMessage();
+        hideMessage();
       }, 5000);
     }
   };
@@ -97,7 +97,7 @@ const App = () => {
       showMessage('correct', 'Successfully created!');
     } catch (exception) {
       console.log('..blog creation failed!');
-      showMessage('error', "Can't create new blog!");
+      showMessage('error', 'Cannot create new blog!');
     }
   };
 
@@ -120,7 +120,7 @@ const App = () => {
         .getAll()
         .then((blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)));
     }
-  }, [user, newBlog]);
+  }, [user]);
 
   const sortBlogs = blogs.sort((a, b) => b.likes - a.likes);
 
@@ -164,7 +164,7 @@ const App = () => {
 
   return (
     <div>
-      <h2>It's Blog app</h2>
+      <h2>Blog app</h2>
       <div>
         Logged in as {user.username}
         <button onClick={handleLogout} style={{ marginLeft: '25px' }}>
