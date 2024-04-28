@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test');
-const { loginWith, createBlog } = require('./helper');
+const { loginWith, logOut, createBlog } = require('./helper');
 
 describe('Bloglist app', () => {
   beforeEach(async ({ page, request }) => {
@@ -9,6 +9,13 @@ describe('Bloglist app', () => {
         name: 'Test name',
         username: 'namemean',
         password: 'pupupu',
+      },
+    });
+    await request.post('/api/users', {
+      data: {
+        name: 'Testing new',
+        username: 'nanana',
+        password: 'pipipi',
       },
     });
     await page.goto('/');
@@ -86,5 +93,31 @@ describe('When logged in', () => {
 
     await createBlog(page, 'Title3', 'AuthorC', 'urlsth3');
     await expect(page.getByText('viewTestTitle3 (AuthorB)')).toBeVisible();
+
+    test('Only creater can remove', async ({ page }) => {
+      await createBlog(page, 'Blog1', 'author1', 'url1');
+      await expect(page.getByText('Successfully created!')).toBeVisible();
+      await expect(page.getByText('viewTestTitle (author1)')).toBeVisible();
+      const blogHidden = page.getByText('viewTestTitle (author1)');
+      await expect(blogHidden).toBeVisible();
+      await blogHidden.getByRole('button', { name: 'view' }).click();
+
+      const blogDetailed = page.getByText('hideTestTitle (author1)');
+      await expect(blogDetailed.getByText('Added by nanana')).toBeVisible();
+      await expect(
+        blogDetailed.getByRole('button', { name: 'remove' })
+      ).toBeVisible();
+
+      await logOut(page);
+      await loginWith(page, 'tytyty', 'hehett');
+      await expect(page.getByText('Logged in as tytyty')).toBeVisible();
+
+      await expect(page.getByText('viewTestTitle (author1)')).toBeVisible();
+      await blogHidden.getByRole('button', { name: 'view' }).click();
+      await expect(blogDetailed.getByText('Added by tytyty')).toBeVisible();
+      await expect(
+        blogDetailed.getByRole('button', { name: 'remove' })
+      ).not.toBeVisible();
+    });
   });
 });
