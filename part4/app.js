@@ -7,6 +7,7 @@ const blogRouter = require('./controllers/blogs');
 const userRouter = require('./controllers/user');
 const loginRouter = require('./controllers/login');
 const middlewares = require('./utils/middlewares');
+const testingRouter = require('./controllers/test');
 const {
   requestLogger,
   unknownEndpoint,
@@ -24,5 +25,7 @@ app.use(middlewares.tokenExtractor);
 app.use(middlewares.userExtractor);
 app.use(unknownEndpoint);
 app.use(errorHandler);
-
+if (process.env.NODE_ENV === 'test') {
+  app.use('/api/testing', testingRouter);
+}
 module.exports = app;
