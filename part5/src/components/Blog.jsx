@@ -47,7 +47,7 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
           >
             view
           </button>
-          <b>{blog.title}</b> ({blog.author})
+          <b className="blogTitle">{blog.title}</b> ({blog.author})
         </div>
       </div>
 

@@ -181,14 +181,17 @@ const App = () => {
       </Togglable>
 
       <h3>All blogs</h3>
-      {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          likeBlog={likeBlog}
-          handleRemoveBlog={handleRemoveBlog}
-        />
-      ))}
+      <div data-testid="blogList">
+        {blogs.map((blog) => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            likeBlog={likeBlog}
+            handleRemoveBlog={handleRemoveBlog}
+          />
+        ))}
+      </div>
+
       {/* <h3>Create new blog</h3>
       <div className={messageStyle}>{message}</div>
       <form onSubmit={handleCreate}>

@@ -14,6 +14,21 @@ const createBlog = async (page, title, author, url) => {
   await page.locator('#author-input').fill(author);
   await page.locator('#url-input').fill(url);
   await page.getByRole('button', { name: 'create' }).click();
+  await page.getByText(`${title} ${author}`, { exact: true }).waitFor();
 };
 
-export { loginWith, logOut, createBlog };
+const likeBlog = async (page, blogTitle, blogUrl, expectedLikes) => {
+  const selectedBlog = await page
+    .getByText(blogTitle, { exact: true })
+    .locator('..');
+  await selectedBlog.getByRole('button', { name: 'view' }).click();
+  const selectedUrl = await page
+    .getByText(blogUrl, { exact: true })
+    .locator('..');
+
+  await selectedUrl.getByRole('button', { name: 'like' }).click();
+  await selectedUrl.getByText(expectedLikes).waitFor();
+  await selectedBlog.getByRole('button', { name: 'hide' }).click();
+};
+
+export { loginWith, logOut, createBlog, likeBlog };
