@@ -39,7 +39,7 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
 
   return (
     <div>
-      <div style={hideWhenVisible}>
+      <div style={hideWhenVisible} id="hide-details">
         <div style={blogStyle}>
           <button
             style={{ marginRight: '14px' }}
@@ -51,7 +51,7 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
         </div>
       </div>
 
-      <div style={showWhenVisible}>
+      <div style={showWhenVisible} id="show-details">
         <div style={blogStyle}>
           <button
             style={{ marginRight: '15px' }}
