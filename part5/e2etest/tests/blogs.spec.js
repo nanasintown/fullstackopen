@@ -1,4 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test');
+const { loginWith, createBlog } = require('./helper');
 
 describe('Bloglist app', () => {
   beforeEach(async ({ page, request }) => {
@@ -30,8 +31,7 @@ describe('Bloglist app', () => {
 
 describe('Login', () => {
   test('succeeds with correct credentials', async ({ page }) => {
-    await page.locator('input[name="Username"]').fill('namemean');
-    await page.locator('input[name="Password"]').fill('pupupu');
+    await loginWith(page, 'namemean', 'pupupu');
     await page.getByRole('button', { name: 'login' }).click();
     await expect(page.getByText('Logged in as namemean')).toBeVisible();
     await expect(
@@ -40,13 +40,32 @@ describe('Login', () => {
   });
 
   test('fails with wrong credentials', async ({ page }) => {
-    await page.locator('input[name="Username"]').fill('nammeds');
-    await page.locator('input[name="Password"]').fill('popopop');
+    await loginWith(page, 'nememn', 'ppopopop');
     await page.getByRole('button', { name: 'login' }).click();
     await expect(page.getByText('Logged in as namemean')).not.toBeVisible();
     await expect(
       page.getByRole('heading', { name: 'All blogs' })
     ).not.toBeVisible();
     await expect(page.getByText('Wrong username or password')).toBeVisible();
+  });
+});
+
+describe('When logged in', () => {
+  beforeEach(async ({ page }) => {
+    await loginWith(page, 'namemean', 'pupupu');
+    await expect(page.getByText('Logged in as namemean')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'All blogs' })
+    ).toBeVisible();
+  });
+
+  test('a new blog can be created', async ({ page }) => {
+    await createBlog(page, 'newTitle', 'newAuthor', 'newURL');
+    await expect(
+      page.getByText('Succesfully added new blog information')
+    ).toBeVisible();
+    await expect(
+      page.getByText('viewTestTitle (newAuthor)').toBeVisible()
+    ).toBeVisible();
   });
 });
