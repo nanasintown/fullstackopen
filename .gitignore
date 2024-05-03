@@ -1,2 +1,4 @@
 **/.DS_Store
 .DS_Store
+part4/node*
+*/node_modules
