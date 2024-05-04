@@ -2,6 +2,7 @@ import AnecdoteForm from './components/AnecdoteForm';
 import Notification from './components/Notification';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAnecdotes, createAnecdote, voteAnecdote } from './routing';
+import { useMessageDispatch } from '../notiService';
 
 const App = () => {
   const result = useQuery({
@@ -10,6 +11,7 @@ const App = () => {
     retry: 1,
   });
   const queryClient = useQueryClient();
+  const dispatch = useMessageDispatch();
 
   const newAnecdoteMutation = useMutation({
     mutationFn: createAnecdote,
@@ -45,6 +47,7 @@ const App = () => {
 
   const addAnecdote = async (event) => {
     event.preventDefault();
+
     const content = event.target.anecdote.value;
     if (content.length >= 5) {
       event.target.anecdote.value = '';
@@ -54,11 +57,22 @@ const App = () => {
         'validation error: content too short, must be at least 5 characters'
       );
     }
+    dispatch({ type: 'DISPLAY_MESSAGE', msg: `anecdote '${content}' created` });
+    setTimeout(() => {
+      dispatch({ type: 'CLEAR_MESSAGE' });
+    }, 5000);
   };
 
   const handleVote = (anecdote) => {
     console.log('anecdote ID: ', anecdote.id);
     voteAnecdoteMutation.mutate({ ...anecdote, votes: anecdote.votes + 1 });
+    dispatch({
+      type: 'DISPLAY_MESSAGE',
+      msg: `anecdote '${anecdote.content}' voted`,
+    });
+    setTimeout(() => {
+      dispatch({ type: 'CLEAR_MESSAGE' });
+    }, 5000);
   };
 
   return (
