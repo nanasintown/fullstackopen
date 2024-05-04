@@ -19,6 +19,15 @@ const App = () => {
       const anecs = queryClient.getQueryData(['anecdotes']);
       queryClient.setQueryData(['anecdotes'], anecs.concat(newAnec));
     },
+    onError: () => {
+      dispatch({
+        type: 'DISPLAY_MESSAGE',
+        msg: `content too short, must be at least 5 characters`,
+      });
+      setTimeout(() => {
+        dispatch({ type: 'CLEAR_MESSAGE' });
+      }, 5000);
+    },
   });
 
   const voteAnecdoteMutation = useMutation({
